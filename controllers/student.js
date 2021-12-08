@@ -77,16 +77,21 @@ async function addStudent(req, res) {
 
 async function importStudents(req, res) {
   if (req.file === undefined) {
-    return res.status(500);
+    return res.sendStatus(500);
   }
   const workbook = xlsx.read(req.file.buffer);
   const sheets = workbook.SheetNames;
   const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheets[0]]);
-  const created = await prisma.student.createMany({
-    data,
-    skipDuplicates: true,
-  });
-  return res.send(created);
+  try {
+    const created = await prisma.student.createMany({
+      data,
+      skipDuplicates: true,
+    });
+    return res.send(created);
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
 }
 
 async function uploadAudio(req, res) {
