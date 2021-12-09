@@ -11,7 +11,9 @@ datasource db {
 }
 
 model Student {
-  id    String  @id
-  name  String
-  audio String?
+  id        String    @id
+  name      String
+  audio     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
 }

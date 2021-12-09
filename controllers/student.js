@@ -12,7 +12,10 @@ async function getStudents(req, res) {
 async function getStudent(req, res) {
   const { id } = req.params;
   try {
-    const user = await prisma.student.findUnique({ where: { id } });
+    const user = await prisma.student.findUnique({
+      where: { id },
+      orderBy: [{ createdAt: "asc" }],
+    });
     if (user === null) {
       return res.sendStatus(404);
     }
