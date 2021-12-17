@@ -5,7 +5,9 @@ const path = require("path");
 const mime = require("mime-types");
 
 async function getStudents(req, res) {
-  const users = await prisma.student.findMany();
+  const users = await prisma.student.findMany({
+    orderBy: [{ name: "asc" }],
+  });
   return res.send(users);
 }
 
@@ -14,7 +16,6 @@ async function getStudent(req, res) {
   try {
     const user = await prisma.student.findUnique({
       where: { id },
-      orderBy: [{ createdAt: "asc" }],
     });
     if (user === null) {
       return res.sendStatus(404);
@@ -80,7 +81,7 @@ async function addStudent(req, res) {
 
 async function importStudents(req, res) {
   if (req.file === undefined) {
-    return res.sendStatus(500);
+    return res.status(400).send({ message: "File required" });
   }
   const workbook = xlsx.read(req.file.buffer);
   const sheets = workbook.SheetNames;
