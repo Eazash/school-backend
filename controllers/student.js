@@ -4,6 +4,11 @@ const xlsx = require("xlsx");
 const path = require("path");
 const mime = require("mime-types");
 
+const GRADES = ["KG-1", "KG-2", "KG-3"];
+function isValidGrade(grade) {
+  return grade !== undefined && GRADES.includes(grade);
+}
+
 async function getStudents(req, res) {
   const users = await prisma.student.findMany({
     orderBy: [{ name: "asc" }],
@@ -29,9 +34,17 @@ async function getStudent(req, res) {
 
 async function updateStudent(req, res) {
   const { id } = req.params;
-  const { name } = req.body;
+  const { name, grade, section } = req.body;
   try {
-    const user = await prisma.student.update({ where: { id }, data: { name } });
+    if (!isValidGrade(grade)) {
+      return res
+        .statu(400)
+        .send({ message: `Invalid grade, must be one of ${GRADES}` });
+    }
+    const user = await prisma.student.update({
+      where: { id },
+      data: { name, grade, section },
+    });
     return res.send(user);
   } catch (error) {
     if (error.code === "P2025") {
@@ -61,11 +74,16 @@ async function deleteStudent(req, res) {
 async function addStudent(req, res) {
   const { id, name, grade, section } = req.body;
   try {
+    if (!isValidGrade(grade)) {
+      return res
+        .status(400)
+        .send({ message: `Invalid grade, must be one of ${GRADES}` });
+    }
     const student = await prisma.student.create({
       data: {
         id,
         name,
-        grade: parseInt(grade),
+        grade,
         section,
       },
     });
