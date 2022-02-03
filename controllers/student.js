@@ -59,12 +59,14 @@ async function deleteStudent(req, res) {
 }
 
 async function addStudent(req, res) {
-  const { id, name } = req.body;
+  const { id, name, grade, section } = req.body;
   try {
     const student = await prisma.student.create({
       data: {
         id,
         name,
+        grade: parseInt(grade),
+        section,
       },
     });
     return res.send(student);
