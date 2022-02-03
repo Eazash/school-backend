@@ -18,6 +18,6 @@ router.post("/", addStudent);
 router.put("/:id", updateStudent);
 router.delete("/:id", deleteStudent);
 router.post("/import", upload.single("file"), importStudents);
-router.post("/audio", upload.single("audio"), uploadAudio);
+router.post("/audio/:id", upload.single("file"), uploadAudio);
 
 module.exports = router;

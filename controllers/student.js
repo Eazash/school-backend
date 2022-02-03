@@ -101,7 +101,7 @@ async function importStudents(req, res) {
 }
 
 async function uploadAudio(req, res) {
-  const { id } = req.body;
+  const { id } = req.params;
   const { buffer, originalname, mimetype } = req.file;
   const newFileName = `${Date.now()}${
     path.extname(originalname) || `.${mime.extension(mimetype)}`
