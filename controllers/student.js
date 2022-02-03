@@ -133,6 +133,39 @@ async function uploadAudio(req, res) {
   }
 }
 
+async function uploadImage(req, res) {
+  const { id } = req.params;
+  const { buffer, originalname, mimetype } = req.file;
+  const newFileName = `${Date.now()}${
+    path.extname(originalname) || `.${mime.extension(mimetype)}`
+  }`;
+  const filePath = path.join(process.cwd(), "uploads", newFileName);
+  try {
+    let student = await prisma.student.findUnique({
+      where: { id },
+    });
+    await fs.writeFile(filePath, buffer);
+    student = await prisma.student.update({
+      where: {
+        id,
+      },
+      data: {
+        image: newFileName,
+      },
+    });
+    return res.send(student);
+  } catch (error) {
+    if (error.code === "P2025") {
+      return res
+        .status(400)
+        .send({ message: `Student with ID (${id}) does not exist` });
+    }
+    console.error(error);
+    // await fs.unlink(filePath);
+    return res.sendStatus(500);
+  }
+}
+
 module.exports = {
   getStudent,
   getStudents,
@@ -141,4 +174,5 @@ module.exports = {
   importStudents,
   uploadAudio,
   deleteStudent,
+  uploadImage,
 };
