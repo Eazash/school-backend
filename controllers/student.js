@@ -14,7 +14,12 @@ function isValidGrade(grade) {
 }
 
 async function getStudents(req, res) {
+  const { grade, section } = req.query;
   const users = await prisma.student.findMany({
+    where: {
+      grade,
+      section,
+    },
     orderBy: [{ name: "asc" }],
   });
   return res.send(users);
@@ -142,6 +147,9 @@ async function importStudents(req, res) {
 
 async function uploadAudio(req, res) {
   const { id } = req.params;
+  if (req.file === undefined) {
+    return res.status(400).send({ message: "Audio required" });
+  }
   const { buffer, originalname, mimetype } = req.file;
   const newFileName = `${Date.now()}${
     path.extname(originalname) || `.${mime.extension(mimetype)}`
