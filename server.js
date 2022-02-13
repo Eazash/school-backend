@@ -2,10 +2,16 @@ require("dotenv").config();
 
 const express = require("express");
 const app = express();
+const http = require("http");
+const { Server } = require("socket.io");
 const cors = require("cors");
 const prisma = require("./util/prisma");
 const studentRouter = require("./routes/student.js");
 const morgan = require("morgan");
+const makeMiddleware = require("multer/lib/make-middleware");
+
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
 
 const PORT = process.env.PORT || 3000;
 
@@ -14,7 +20,17 @@ app.use(express.json({ extended: true }));
 app.use(morgan("dev"));
 app.use("/api/students", studentRouter);
 app.use("/public", express.static("uploads"));
-app.listen(PORT, () => {
+
+io.on("connection", (socket) => {
+  console.log("A client has connected");
+  socket.emit("hello", "world");
+  socket.on("message", (message) => {
+    console.log(message);
+    io.emit("scan", message);
+  });
+});
+
+server.listen(PORT, () => {
   try {
     prisma.$connect();
   } catch (error) {
