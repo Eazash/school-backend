@@ -3,7 +3,8 @@ const fs = require("fs/promises");
 const xlsx = require("xlsx");
 const path = require("path");
 const mime = require("mime-types");
-const { student } = require("../util/prisma");
+const { getRandomCode } = require("../util/prisma");
+const { PrismaClientRustPanicError, PrismaClientKnownRequestError } = require("@prisma/client/runtime");
 
 const GRADES = ["KG-1", "KG-2", "KG-3"];
 const InvalidGradeError = {
@@ -181,6 +182,7 @@ async function uploadAudio(req, res) {
   }
 }
 
+
 async function uploadImage(req, res) {
   const { id } = req.params;
   const { buffer, originalname, mimetype } = req.file;
@@ -214,6 +216,19 @@ async function uploadImage(req, res) {
   }
 }
 
+async function updateCode(req, res) {
+  const {id} = req.params;
+  try {
+    await prisma.student.update({where: id,data: {code: getRandomCode()}})
+  } catch (error) {
+    if (error instanceof PrismaClientKnownRequestError && error.code === "P2001"){
+      return res.status(400).send({message: `Student with id: ${id} not found`});
+    }
+    console.error(error);
+    return res.sendStatus(500);
+  }
+}
+
 module.exports = {
   getStudent,
   getStudents,
@@ -223,4 +238,5 @@ module.exports = {
   uploadAudio,
   deleteStudent,
   uploadImage,
+  updateCode
 };

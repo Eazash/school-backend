@@ -17,6 +17,7 @@ model Student {
   grade     String
   section   String
   image     String?
+  code      String?
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
 }
