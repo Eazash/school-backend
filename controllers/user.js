@@ -17,6 +17,11 @@ async function generateToken(data) {
 module.exports.getUsers = async function (req, res) {
   try {
     const users = await prisma.user.findMany({
+      where: {
+        NOT: {
+          username: "admin"
+        }
+      },
       orderBy: [{ username: "asc" }],
       select: {
         username: true,
