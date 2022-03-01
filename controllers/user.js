@@ -7,9 +7,8 @@ const jwt = require("jsonwebtoken");
 const prisma = require("../util/prisma");
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
-async function generateToken(user) {
-  const { username, section, role } = user;
-  return await jwt.sign({ username, section, role }, JWT_SECRET, {
+async function generateToken(data) {
+  return await jwt.sign(data, JWT_SECRET, {
     algorithm: "HS256",
     expiresIn: "7d",
   });
@@ -39,7 +38,7 @@ module.exports.getUsers = async function (req, res) {
 };
 
 module.exports.addUser = async function (req, res) {
-  const { username, password, section } = req.body;
+  const { username, password, section, fullName} = req.body;
   let { role } = req.body;
   if (role === undefined) {
     role = "staff";
@@ -48,6 +47,7 @@ module.exports.addUser = async function (req, res) {
   try {
     const user = await prisma.user.create({
       data: {
+        fullName,
         username,
         password: hashedPassword,
         section: {
@@ -59,6 +59,7 @@ module.exports.addUser = async function (req, res) {
         username: true,
         role: true,
         section: true,
+        fullName:true
       },
     });
     const token = await generateToken(user);
@@ -68,6 +69,7 @@ module.exports.addUser = async function (req, res) {
             username: user.username,
             role: user.role,
             section: user.section,
+            fullName: user.fullName,
           },
         });
 

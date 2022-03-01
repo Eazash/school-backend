@@ -32,8 +32,9 @@ model Section {
 model User {
   id Int @id @default(autoincrement())
   role String?
+  fullName String
   username String @unique
   password String
   section Section? @relation(fields: [sectionId], references: [id])
-  sectionId Int
+  sectionId Int?
 }
