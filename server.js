@@ -25,11 +25,14 @@ app.use("/public", express.static("uploads"));
 
 io.on("connection", (socket) => {
   console.log("A client has connected");
-  socket.emit("hello", "world");
-  socket.on("message", (message) => {
-    console.log(message);
-    io.emit("scan", message);
+  socket.on("attachToClass", (className) => {
+    console.log( `Joining ${className}`);
+    socket.join(className);
   });
+  socket.on("scan", (student) => {
+    console.log(student);
+    io.to(`${student.grade}:${student.section}`).emit("result",student);
+  })
 });
 
 server.listen(PORT, () => {
