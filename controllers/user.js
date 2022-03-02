@@ -24,9 +24,11 @@ module.exports.getUsers = async function (req, res) {
       },
       orderBy: [{ username: "asc" }],
       select: {
+        id:true,
         username: true,
         section: true,
         role: true,
+        fullName: true
       },
     });
     return res.send(users);
@@ -61,6 +63,7 @@ module.exports.addUser = async function (req, res) {
         role,
       },
       select: {
+        id:true,
         username: true,
         role: true,
         section: true,
@@ -95,7 +98,7 @@ module.exports.login = async function (req, res) {
   const ERROR = {message: "Invalid username and password"};
   const {username, password} = req.body;
   try {
-    const user = await prisma.user.findUnique({where: {username},select: {username: true, role: true, password: true, section: true}});
+    const user = await prisma.user.findUnique({where: {username},select: {id: true, username: true, role: true, password: true, section: true}});
     if (user ===null) {
       return res.status(400).send(ERROR);
     }
@@ -132,6 +135,7 @@ module.exports.updateClass = async function (req, res) {
         },
       },
       select: {
+        id:true,
         username: true,
         section: true,
       },
