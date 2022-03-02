@@ -120,18 +120,17 @@ module.exports.login = async function (req, res) {
   }
 }
 
-module.exports.updateClass = async function (req, res) {
+module.exports.update = async function (req, res) {
   const { id } = req.params;
-  const { grade, section } = req.body;
+  const { username, fullName, section } = req.body;
   try {
     const user = await prisma.user.update({
       where: { id: parseInt(id) },
       data: {
+        username,
+        fullName,
         section: {
-          upsert: {
-            create: { grade, section },
-            update: { grade, section },
-          },
+          update: section
         },
       },
       select: {
