@@ -14,13 +14,30 @@ async function generateToken(data) {
   });
 }
 
+module.exports.getUserWithRole = async function (req, res) {
+  const {role} = req.query;
+  try {
+    console.log(role);
+    const user = await prisma.user.findFirst({
+      where: {
+        role
+      },
+      select: {
+        id: true, username: true, fullName: true
+      }
+    });
+    return res.send(user);
+  }catch(error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
+
 module.exports.getUsers = async function (req, res) {
   try {
     const users = await prisma.user.findMany({
       where: {
-        NOT: {
-          username: "admin"
-        }
+        role: "staff"
       },
       orderBy: [{ username: "asc" }],
       select: {
@@ -137,6 +154,7 @@ module.exports.update = async function (req, res) {
         id:true,
         username: true,
         section: true,
+        fullName: true
       },
     });
     return res.send(user);
