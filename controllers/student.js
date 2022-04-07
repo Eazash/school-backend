@@ -219,7 +219,8 @@ async function uploadImage(req, res) {
 async function updateCode(req, res) {
   const {id} = req.params;
   try {
-    await prisma.student.update({where: id,data: {code: getRandomCode()}})
+    const updatedUser= await prisma.student.update({where: {id},data: {code: getRandomCode()}})
+    return res.send(updatedUser)
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError && error.code === "P2001"){
       return res.status(400).send({message: `Student with id: ${id} not found`});
